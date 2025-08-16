@@ -16,4 +16,4 @@ fmt:
 
 [no-cd]
 @release *ARGS:
-    uv run {{ justfile_directory() }}/.bin/bump.py release {{ ARGS }}
+    uv run {{ justfile_directory() }}/.bin/release.py {{ ARGS }}

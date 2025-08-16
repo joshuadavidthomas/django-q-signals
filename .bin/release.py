@@ -70,7 +70,12 @@ def release(
         raise typer.Exit(1)
 
     log = run(["git", "log", "-1", "--pretty=format:%s"], force_run=True)
+
+    # Try "bump version" pattern first
     if match := re.search(r"bump version .* -> ([\d.]+)", log):
+        version = match.group(1)
+    # Fall back to "release vX.X.X" pattern
+    elif match := re.search(r"release v([\d.]+)", log):
         version = match.group(1)
     else:
         console.print("Could not find version in latest commit message")

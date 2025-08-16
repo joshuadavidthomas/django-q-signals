@@ -18,6 +18,10 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 ## [Unreleased]
 
+## [0.1.0]
+
+### Added
+
 - Created `@async_receiver` decorator for processing Django signals asynchronously through Django Q2.
   - Includes automatic serialization and reconstruction of model instances for task queue compatibility.
   - Handles deleted instances with `_instance_pk` preservation.
@@ -27,4 +31,5 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 - Josh Thomas <josh@joshthomas.dev> (maintainer)
 
-[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/tree/main
+[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/compare/v0.1.0..HEAD
+[0.1.0]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.1.0
