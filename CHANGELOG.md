@@ -18,6 +18,8 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 ## [Unreleased]
 
+## [0.2.0]
+
 ### Added
 
 - Support for async signal handlers - async functions decorated with `@async_receiver` are now properly handled using `asgiref.sync.async_to_sync` for execution in Django Q2's worker processes.
@@ -35,5 +37,6 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 - Josh Thomas <josh@joshthomas.dev> (maintainer)
 
-[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/compare/v0.1.0..HEAD
+[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/compare/v0.2.0...HEAD
 [0.1.0]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.1.0
+[0.2.0]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.2.0
