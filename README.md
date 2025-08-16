@@ -164,7 +164,7 @@ async def process_article_async(sender, instance, **kwargs):
     return await generate_summary(instance.content)
 ```
 
-Async handlers are automatically wrapped with `asgiref.sync.async_to_sync` for execution in Django Q2's worker processes, just like Django's `@receiver` does internally.
+Async handlers are automatically wrapped with `asgiref.sync.async_to_sync` for execution in Django Q2's worker processes, matching Django's `@receiver` behavior.
 
 ### Django Q2 Models
 
@@ -201,7 +201,7 @@ def process_article(sender, instance, **kwargs):
 
 In particular, `post_save` signals with `created=False` (updates to existing instances) and `m2m_changed` signals are more prone to this race condition, since these often involve instances that might be deleted soon after modification. Newly created instances (`created=True`) are less likely to be immediately deleted, and for delete signals the instance is expected to be gone anyway.
 
-Honestly, if you need a task to run regardless of instance deletion, you're better off using Django's built-in `@receiver` and calling `async_task` directly with the data you need, rather than using `@async_reciever`.
+Honestly, if you need a task to run regardless of instance deletion, you're better off using Django's built-in `@receiver` and calling `async_task` directly with the data you need, rather than using `@async_receiver`.
 
 ## Development
 
