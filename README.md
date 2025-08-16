@@ -180,7 +180,7 @@ Only serializable signal kwargs (strings, numbers, lists, dicts, etc.) are passe
 
 ### Race Conditions
 
-Since signal handlers decorated with `@async_receiver` run in a task queue asynchronously, there's a potential race condition where an instance might be deleted between when the signal fires and when the async task executes:
+Since signal handlers decorated with `@async_receiver` run in a task queue asynchronously, there's a potential race condition where an instance might be deleted between when the signal fires and when the async task executes.
 
 When an instance cannot be found during task execution, `None` is passed to your handler. However, the instance's primary key is preserved in `kwargs['_instance_pk']` so you can still identify which object was affected:
 
