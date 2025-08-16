@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Callable
+from collections.abc import Coroutine
 from functools import wraps
+from inspect import iscoroutinefunction
 from typing import Any
 
+from asgiref.sync import async_to_sync
 from django.apps import apps
 from django.db import models
 from django.dispatch import Signal
@@ -13,7 +16,7 @@ from django_q.tasks import async_task
 
 Sender = type[models.Model] | None
 Instance = models.Model | None
-SignalHandler = Callable[[Sender, Instance], None]
+SignalHandler = Callable[[Sender, Instance], Coroutine[Any, Any, None] | None]
 
 
 def async_receiver(
@@ -38,8 +41,8 @@ def async_receiver(
     """
 
     def decorator(func: SignalHandler) -> SignalHandler:
-        # Register the async task and get its path
-        task_path = _register_async_task(func)
+        # Create and attach a Django Q2-compatible wrapper function to the module
+        task_path = _create_async_task_wrapper(func)
 
         @wraps(func)
         def signal_handler(**kwargs: Any) -> None:
@@ -75,10 +78,11 @@ def async_receiver(
     return decorator
 
 
-def _register_async_task(func: SignalHandler) -> str:
-    """Register the async task function and return its path."""
+def _create_async_task_wrapper(func: SignalHandler) -> str:
     task_name = f"{func.__name__}_task"
     task_path = f"{func.__module__}.{task_name}"
+
+    handler = async_to_sync(func) if iscoroutinefunction(func) else func
 
     def async_task_func(
         sender_label: str | None,
@@ -112,7 +116,7 @@ def _register_async_task(func: SignalHandler) -> str:
         ):
             signal_kwargs["update_fields"] = frozenset(signal_kwargs["update_fields"])
 
-        return func(sender, instance, **signal_kwargs)
+        return handler(sender, instance, **signal_kwargs)
 
     async_task_func.__name__ = task_name
     async_task_func.__module__ = func.__module__
