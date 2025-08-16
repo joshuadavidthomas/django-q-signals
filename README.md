@@ -154,6 +154,18 @@ def update_search_index(sender, instance, **kwargs):
             remove_from_index_by_id(pk)
 ```
 
+Just like Django's `@receiver` decorator, `@async_receiver` supports async handlers:
+
+```python
+@async_receiver(post_save, sender=Article)
+async def process_article_async(sender, instance, **kwargs):
+    await external_api.notify(instance.id)
+    await cache.invalidate(f"article_{instance.id}")
+    return await generate_summary(instance.content)
+```
+
+Async handlers are automatically wrapped with `asgiref.sync.async_to_sync` for execution in Django Q2's worker processes, matching Django's `@receiver` behavior.
+
 ### Django Q2 Models
 
 Django Q2's internal models are automatically excluded from async processing and cannot be used with the `@async_receiver`, to prevent infinite recursion. If you need to respond to Django Q2 model changes, use Django Q2's own [signals](https://django-q2.readthedocs.io/en/master/signals.html) or handle them manually using Django's standard `@receiver` decorator.
@@ -168,7 +180,7 @@ Only serializable signal kwargs (strings, numbers, lists, dicts, etc.) are passe
 
 ### Race Conditions
 
-Since signal handlers decorated with `@async_receiver` run in a task queue asynchronously, there's a potential race condition where an instance might be deleted between when the signal fires and when the async task executes:
+Since signal handlers decorated with `@async_receiver` run in a task queue asynchronously, there's a potential race condition where an instance might be deleted between when the signal fires and when the async task executes.
 
 When an instance cannot be found during task execution, `None` is passed to your handler. However, the instance's primary key is preserved in `kwargs['_instance_pk']` so you can still identify which object was affected:
 
@@ -189,7 +201,7 @@ def process_article(sender, instance, **kwargs):
 
 In particular, `post_save` signals with `created=False` (updates to existing instances) and `m2m_changed` signals are more prone to this race condition, since these often involve instances that might be deleted soon after modification. Newly created instances (`created=True`) are less likely to be immediately deleted, and for delete signals the instance is expected to be gone anyway.
 
-Honestly, if you need a task to run regardless of instance deletion, you're better off using Django's built-in `@receiver` and calling `async_task` directly with the data you need, rather than using `@async_reciever`.
+Honestly, if you need a task to run regardless of instance deletion, you're better off using Django's built-in `@receiver` and calling `async_task` directly with the data you need, rather than using `@async_receiver`.
 
 ## Development
 

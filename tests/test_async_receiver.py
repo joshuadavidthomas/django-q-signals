@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import sys
 from functools import partial
 
@@ -123,12 +124,11 @@ def test_instance_deleted_before_async_execution():
     module = sys.modules[handler.__module__]
     task_func = module.handler_task
 
-    # This simulates the async task running after the instance was deleted
     task_func(
-        "tests.qsignalsmodel",  # sender_label
-        "tests.qsignalsmodel",  # instance_label
-        instance_id,  # The ID of the now-deleted instance
-        {},  # signal_kwargs
+        "tests.qsignalsmodel",
+        "tests.qsignalsmodel",
+        instance_id,
+        {},
     )
 
     # The handler should receive None for instance but get the pk in kwargs
@@ -149,3 +149,68 @@ def test_none_instance_handling():
 
     assert result["called"] is True
     assert result["instance"] is None
+
+
+@pytest.mark.django_db
+def test_async_handler_support():
+    result = {"called": False, "is_async": False, "value": None}
+
+    @async_receiver(post_save, sender=QSignalsModel)
+    async def async_handler(sender, instance, **kwargs):
+        # Test that we can use await in the handler
+        await asyncio.sleep(0.001)
+        result["called"] = True
+        result["is_async"] = True
+        result["value"] = instance.value
+        return "async result"
+
+    instance = QSignalsModel.objects.create(name="AsyncTest", value=99)
+
+    # Call the task function directly to simulate Django Q2 execution
+    module = sys.modules[async_handler.__module__]
+    task_func = module.async_handler_task
+
+    task_func(
+        "tests.qsignalsmodel",
+        "tests.qsignalsmodel",
+        instance.pk,
+        {"created": True},
+    )
+
+    assert result["called"] is True
+    assert result["is_async"] is True
+    assert result["value"] == 99
+
+
+@pytest.mark.django_db
+def test_mixed_sync_async_handlers():
+    results = {"sync": False, "async": False}
+
+    @async_receiver(post_save, sender=QSignalsModel)
+    def sync_handler(sender, instance, **kwargs):
+        results["sync"] = True
+
+    @async_receiver(post_save, sender=QSignalsModel)
+    async def async_handler(sender, instance, **kwargs):
+        await asyncio.sleep(0.001)
+        results["async"] = True
+
+    instance = QSignalsModel.objects.create(name="Mixed", value=42)
+
+    module = sys.modules[sync_handler.__module__]
+
+    module.sync_handler_task(
+        "tests.qsignalsmodel",
+        "tests.qsignalsmodel",
+        instance.pk,
+        {"created": True},
+    )
+    module.async_handler_task(
+        "tests.qsignalsmodel",
+        "tests.qsignalsmodel",
+        instance.pk,
+        {"created": True},
+    )
+
+    assert results["sync"] is True
+    assert results["async"] is True
