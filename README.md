@@ -154,6 +154,18 @@ def update_search_index(sender, instance, **kwargs):
             remove_from_index_by_id(pk)
 ```
 
+Just like Django's `@receiver` decorator, `@async_receiver` supports async handlers:
+
+```python
+@async_receiver(post_save, sender=Article)
+async def process_article_async(sender, instance, **kwargs):
+    await external_api.notify(instance.id)
+    await cache.invalidate(f"article_{instance.id}")
+    return await generate_summary(instance.content)
+```
+
+Async handlers are automatically wrapped with `asgiref.sync.async_to_sync` for execution in Django Q2's worker processes, just like Django's `@receiver` does internally.
+
 ### Django Q2 Models
 
 Django Q2's internal models are automatically excluded from async processing and cannot be used with the `@async_receiver`, to prevent infinite recursion. If you need to respond to Django Q2 model changes, use Django Q2's own [signals](https://django-q2.readthedocs.io/en/master/signals.html) or handle them manually using Django's standard `@receiver` decorator.
