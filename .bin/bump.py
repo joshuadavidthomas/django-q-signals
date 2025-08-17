@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.10"
 # dependencies = [
 #     "bumpver",
 #     "rich",
@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 from typing import Annotated
 
@@ -22,13 +22,13 @@ cli = typer.Typer()
 console = Console()
 
 
-class Version(StrEnum):
+class Version(str, Enum):
     MAJOR = "major"
     MINOR = "minor"
     PATCH = "patch"
 
 
-class Tag(StrEnum):
+class Tag(str, Enum):
     DEV = "dev"
     ALPHA = "alpha"
     BETA = "beta"
