@@ -18,6 +18,8 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 ## [Unreleased]
 
+## [0.2.1]
+
 ### Changed
 
 - Simplified signal handling in `@async_receiver` decorator by removing redundant iterable checking, as `django.dispatch.receiver` already handles multiple signals internally.
@@ -41,6 +43,7 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 - Josh Thomas <josh@joshthomas.dev> (maintainer)
 
-[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/joshuadavidthomas/django-q-signals/compare/v0.2.1...HEAD
 [0.1.0]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.1.0
 [0.2.0]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.2.0
+[0.2.1]: https://github.com/joshuadavidthomas/django-q-signals/releases/tag/v0.2.1
