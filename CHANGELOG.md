@@ -18,6 +18,10 @@ and this project attempts to adhere to [Semantic Versioning](https://semver.org/
 
 ## [Unreleased]
 
+### Changed
+
+- Simplified signal handling in `@async_receiver` decorator by removing redundant iterable checking, as `django.dispatch.receiver` already handles multiple signals internally.
+
 ## [0.2.0]
 
 ### Added

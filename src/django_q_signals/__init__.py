@@ -66,12 +66,7 @@ def async_receiver(
                 serializable_kwargs,
             )
 
-        # Handle list of signals like Django's receiver does
-        if isinstance(signal, (list, tuple)):
-            for s in signal:
-                receiver(s, sender=sender, **options)(signal_handler)
-        else:
-            receiver(signal, sender=sender, **options)(signal_handler)
+        receiver(signal, sender=sender, **options)(signal_handler)
 
         return func
 
