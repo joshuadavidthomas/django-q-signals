@@ -13,7 +13,7 @@ cog.outl(f"![Django Version](https://img.shields.io/badge/django-{'%20%7C%20'.jo
 ]]] -->
 [![PyPI](https://img.shields.io/pypi/v/django-q-signals)](https://pypi.org/project/django-q-signals/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-q-signals)
-![Django Version](https://img.shields.io/badge/django-4.2%20%7C%205.1%20%7C%205.2%20%7C%20main-%2344B78B?labelColor=%23092E20)
+![Django Version](https://img.shields.io/badge/django-5.2%20%7C%206.0%20%7C%206.1%20%7C%20main-%2344B78B?labelColor=%23092E20)
 <!-- [[[end]]] -->
 
 Process Django signals asynchronously with [Django Q2](https://github.com/django-q2/django-q2).
@@ -30,8 +30,8 @@ from noxfile import PY_VERSIONS
 cog.outl(f"- Python {', '.join([version for version in PY_VERSIONS])}")
 cog.outl(f"- Django {', '.join([version for version in DJ_VERSIONS if version != 'main'])}")
 ]]] -->
-- Python 3.10, 3.11, 3.12, 3.13
-- Django 4.2, 5.1, 5.2
+- Python 3.10, 3.11, 3.12, 3.13, 3.14
+- Django 5.2, 6.0, 6.1
 <!-- [[[end]]] -->
 
 ## Installation
@@ -94,10 +94,10 @@ def process_article_task(article_id):
 @receiver(post_save, sender=Article)
 def notify_subscribers(sender, instance, **kwargs):
     # Queue the task instead of running it now
-    async_task('myapp.tasks.process_article_task', instance.pk)
+    async_task("myapp.tasks.process_article_task", instance.pk)
 ```
 
-But who wants to write all that boilerplate every time you need to offload a signal handler? (Yes, it's barely any boilerplate and the explicit version is arguably clearer, but let me have this.) 
+But who wants to write all that boilerplate every time you need to offload a signal handler? (Yes, it's barely any boilerplate and the explicit version is arguably clearer, but let me have this.)
 
 Instead, `@async_receiver` can handle all this for you:
 
@@ -143,14 +143,15 @@ The `@async_receiver` decorator accepts the same arguments as Django's `@receive
 def process_article(sender, instance, **kwargs):
     generate_thumbnails(instance)
 
+
 # Handle multiple signals with one handler
 @async_receiver([post_save, post_delete], sender=Article)
 def update_search_index(sender, instance, **kwargs):
-    if kwargs.get('created', False):
+    if kwargs.get("created", False):
         add_to_index(instance)
     elif instance is None:
         # Instance was deleted but pk is preserved
-        if pk := kwargs.get('_instance_pk'):
+        if pk := kwargs.get("_instance_pk"):
             remove_from_index_by_id(pk)
 ```
 
@@ -189,7 +190,7 @@ When an instance cannot be found during task execution, `None` is passed to your
 def process_article(sender, instance, **kwargs):
     if instance is None:
         # Instance was deleted, but we have the pk
-        article_id = kwargs.get('_instance_pk')
+        article_id = kwargs.get("_instance_pk")
         logger.warning(f"Article {article_id} was deleted before processing")
         # Could still do cleanup based on the ID
         cleanup_article_artifacts(article_id)

@@ -9,14 +9,14 @@ dev = [
   "nox[uv]>=2024.10.9",
   "pytest>=8.4.1",
   "pytest-cov>=6.2.1",
-  "pytest-django>=4.10.0",
+  "pytest-django>=4.14.0",
   "pytest-randomly>=3.16.0",
   "pytest-xdist>=3.8.0",
   "ruff>=0.12.9",
 ]
 types = [
-  "django-stubs>=5.2.2",
-  "django-stubs-ext>=5.2.2",
+  "django-stubs>=6.1.0; python_version >= '3.11'",
+  "django-stubs-ext>=6.1.0; python_version >= '3.11'",
   "mypy>=1.17.1",
 ]
 
@@ -38,9 +38,9 @@ classifiers = [
   #         continue
   #     cog.outl(f'  "Framework :: Django :: {version}",')
   # ]]] -->
-  "Framework :: Django :: 4.2",
-  "Framework :: Django :: 5.1",
   "Framework :: Django :: 5.2",
+  "Framework :: Django :: 6.0",
+  "Framework :: Django :: 6.1",
   # [[[end]]]
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
@@ -60,11 +60,12 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   # [[[end]]]
   "Programming Language :: Python :: Implementation :: CPython"
 ]
 dependencies = [
-  "django>=4.2",
+  "django>=5.2",
   "django-q2",
 ]
 description = "Process Django signals asynchronously with Django Q2."
